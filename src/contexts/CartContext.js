@@ -1,37 +1,47 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
 const CartContext = createContext();
 
-const cartReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD_TO_CART":
-      return { ...state, items: [...state.items, action.payload] };
-    case "REMOVE_FROM_CART":
-      return { ...state, items: state.items.filter((item) => item.id !== action.payload) };
-    case "UPDATE_QUANTITY":
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
-            : item
-        ),
-      };
-    case "CLEAR_CART":
-      return { ...state, items: [] };
-    default:
-      return state;
-  }
+export const useCart = () => useContext(CartContext);
+
+export const CartProvider = ({ children }) => {
+    const [cartItems, setCartItems] = useState([]);
+
+    const addToCart = (product) => {
+        const existingItem = cartItems.find(item => item.id === product.id);
+
+        if (existingItem) {
+            setCartItems(cartItems.map(item =>
+                item.id === product.id
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            ));
+        } else {
+            setCartItems([...cartItems, { ...product, quantity: 1 }]);
+        }
+    };
+
+    const removeFromCart = (id) => {
+        setCartItems(cartItems.filter(item => item.id !== id));
+    };
+
+    const updateQuantity = (id, quantity) => {
+        setCartItems(cartItems.map(item =>
+            item.id === id
+                ? { ...item, quantity: Math.max(quantity, 1) }
+                : item
+        ));
+    };
+
+    const clearCart = () => {
+        setCartItems([]);
+    };
+
+    const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    return (
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, totalPrice }}>
+            {children}
+        </CartContext.Provider>
+    );
 };
-
-const CartProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [] });
-
-  return (
-    <CartContext.Provider value={{ cart: state, dispatch }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
-
-export { CartContext, CartProvider };

@@ -1,28 +1,23 @@
-import React, { useContext } from "react";
-import { CartContext } from "../contexts/CartContext";
+import React from "react";
+import { useCart } from "../contexts/CartContext";
 
 const Cart = ({ onClose }) => {
-  const { cart, dispatch } = useContext(CartContext);
+  const { cartItems, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
 
   const handleQuantityChange = (id, quantity) => {
     if (quantity === 0) {
-      dispatch({ type: "REMOVE_FROM_CART", payload: id });
+      removeFromCart(id);
     } else {
-      dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } });
+      updateQuantity(id, quantity);
     }
   };
 
-  const totalAmount = cart.items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const discountedAmount = totalAmount >= 1000 ? totalAmount * 0.9 : totalAmount;
+  const discountedAmount = totalPrice >= 1000 ? totalPrice * 0.9 : totalPrice;
 
   const handleCheckout = () => {
-    console.log("Замовлення:", cart.items);
+    console.log("Замовлення:", cartItems);
     alert("Замовлення оформлено!");
-    dispatch({ type: "CLEAR_CART" });
+    clearCart();
     onClose();
   };
 
@@ -32,11 +27,11 @@ const Cart = ({ onClose }) => {
         ✖
       </button>
       <h2>Кошик</h2>
-      {cart.items.length === 0 ? (
+      {cartItems.length === 0 ? (
         <p>Кошик порожній</p>
       ) : (
         <div>
-          {cart.items.map((item) => (
+          {cartItems.map((item) => (
             <div key={item.id} className="cart-item">
               <span>{item.name}</span>
               <span>{item.price} грн</span>
@@ -59,8 +54,8 @@ const Cart = ({ onClose }) => {
             </div>
           ))}
           <div className="cart-summary">
-            <p>Загальна сума: {totalAmount} грн</p>
-            {totalAmount >= 1000 && <p>Знижка: 10%</p>}
+            <p>Загальна сума: {totalPrice} грн</p>
+            {totalPrice >= 1000 && <p>Знижка: 10%</p>}
             <p>До сплати: {discountedAmount} грн</p>
           </div>
           <button onClick={handleCheckout}>Оформити замовлення</button>

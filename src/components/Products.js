@@ -1,13 +1,9 @@
-import React, { useContext } from "react";
-import { CartContext } from "../contexts/CartContext";
+import React from "react";
+import { useCart } from "../contexts/CartContext";
 import productsData from "../data/products";
 
 const Products = () => {
-  const { dispatch } = useContext(CartContext);
-
-  const addToCart = (product) => {
-    dispatch({ type: "ADD_TO_CART", payload: { ...product, quantity: 1 } });
-  };
+  const { addToCart } = useCart();
 
   return (
     <section className="products">
