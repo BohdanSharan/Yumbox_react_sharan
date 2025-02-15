@@ -6,9 +6,9 @@ const Cart = ({ onClose }) => {
 
   const handleQuantityChange = (id, quantity) => {
     if (quantity === 0) {
-      removeFromCart(id);
+      removeFromCart(id); 
     } else {
-      updateQuantity(id, quantity);
+      updateQuantity(id, quantity);  
     }
   };
 
@@ -17,9 +17,11 @@ const Cart = ({ onClose }) => {
   const handleCheckout = () => {
     console.log("Замовлення:", cartItems);
     alert("Замовлення оформлено!");
-    clearCart();
-    onClose();
+    clearCart();  
+    onClose();    
   };
+
+  const formatPrice = (price) => price.toFixed(2) + " грн";
 
   return (
     <div className="cart-modal">
@@ -28,13 +30,13 @@ const Cart = ({ onClose }) => {
       </button>
       <h2>Кошик</h2>
       {cartItems.length === 0 ? (
-        <p>Кошик порожній</p>
+        <p>Кошик порожній</p>  
       ) : (
         <div>
           {cartItems.map((item) => (
             <div key={item.id} className="cart-item">
               <span>{item.name}</span>
-              <span>{item.price} грн</span>
+              <span>{formatPrice(item.price)}</span>
               <div>
                 <button
                   onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
@@ -54,9 +56,9 @@ const Cart = ({ onClose }) => {
             </div>
           ))}
           <div className="cart-summary">
-            <p>Загальна сума: {totalPrice} грн</p>
+            <p>Загальна сума: {formatPrice(totalPrice)}</p>
             {totalPrice >= 1000 && <p>Знижка: 10%</p>}
-            <p>До сплати: {discountedAmount} грн</p>
+            <p>До сплати: {formatPrice(discountedAmount)}</p>
           </div>
           <button onClick={handleCheckout}>Оформити замовлення</button>
         </div>
